@@ -79,9 +79,9 @@ GoogleAuth.get('/google/callback', passport_1.default.authenticate("google", { s
     const { refreshToken, accesToken } = req.user;
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.APP_MODE === "PROD",
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: "strict",
+        sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
     });
     res.redirect(`http://localhost:5173/home?accessToken=${accesToken}`);
 });

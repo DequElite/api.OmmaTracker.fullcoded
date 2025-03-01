@@ -49,9 +49,9 @@ SignInRouter.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, fun
         const { accessToken, refreshToken } = yield SignInUser(email, password);
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false,
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-            sameSite: 'strict'
+            secure: process.env.APP_MODE === "PROD",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
         });
         res.status(201).json({
             message: "User was signin ssuccessfuly",
