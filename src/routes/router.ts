@@ -3,18 +3,18 @@ import cookieParser from "cookie-parser";
 import RegisterRouter from "./register/RegisterRouter";
 import AuthRouter from "./auth/AuthRouter";
 import DataRouter from "./data/DataRouter";
-import { authenticateToken } from "../middleware/authenticateToken";
 
 const API_DIR = "/api";
 
 const cors = require('cors');
+require("dotenv").config();
 
 export default function InitRoutes(app:Express): void {
     app.use(express.json());
     app.use(cookieParser());
 
     app.use(cors({
-        origin: 'https://omma-tracker-fullcoded.vercel.app',
+        origin: process.env.APP_MODE === "DEV" ? process.env.FORNT_END_URI_DEV : process.env.FORNT_END_URI_PROD,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'], 
         credentials: true, 
