@@ -33,6 +33,11 @@ passport.use(
             const email = profile.emails ? profile.emails[0].value : "";
             const username = profile.username || profile.displayName || email.split('@')[0];
 
+            console.log("APP_MODE:", APP_MODE);
+            console.log("CALLBACK_URL:", CALLBACK_URL);
+            console.log("CLIENT_URL:", CLIENT_URL);
+
+
             try{
                 let user = await pool.query(`
                     SELECT * FROM Users 
@@ -103,7 +108,7 @@ GoogleAuth.get(
             return
         }
 
-        const { refreshToken, accesToken } = req.user as any;
+        const { refreshToken, accessToken } = req.user as any;
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.APP_MODE === "PROD",
@@ -111,7 +116,7 @@ GoogleAuth.get(
             sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
         });
 
-        res.redirect(`${CLIENT_URL}/home?accessToken=${accesToken}`);
+        res.redirect(`${CLIENT_URL}/home?accessToken=${accessToken}`);
     }
 )
 
