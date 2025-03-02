@@ -12,12 +12,21 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || "";
 
+const APP_MODE = process.env.APP_MODE || "DEV"; 
+const CALLBACK_URL = APP_MODE === "PROD" 
+    ? process.env.CALLBACK_URL_PROD 
+    : process.env.CALLBACK_URL_DEV;
+
+const CLIENT_URL = APP_MODE === "PROD" 
+    ? process.env.CLIENT_URL_PROD 
+    : process.env.CLIENT_URL_DEV;
+
 passport.use(
     new GoogleStrategy(
         {
             clientID: GOOGLE_CLIENT_ID || "",
             clientSecret: GOOGLE_CLIENT_SECRET || "",
-            callbackURL: '/api/register/google/callback',
+            callbackURL: CALLBACK_URL,
             passReqToCallback: true
         },
         async (_req, accessToken, refreshToken, profile, done) => {
@@ -102,7 +111,7 @@ GoogleAuth.get(
             sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
         });
 
-        res.redirect(`http://localhost:5173/home?accessToken=${accesToken}`);
+        res.redirect(`${CLIENT_URL}/home?accessToken=${accesToken}`);
     }
 )
 
