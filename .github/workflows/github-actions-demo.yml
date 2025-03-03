@@ -1,0 +1,26 @@
+name: Api.OmmaTracker CI/CD Auto
+on: 
+  push:
+    branches: [ main ]
+  pull_request: 
+    branches: [ main ]
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 22.x ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instaling Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}  
+      - name: Checking the Node.js version
+        run: node --version 
+      - name: Checking the npm version
+        run: npm --version 
+      - name: installing modules
+        run: npm install
+      - name: build project
+        run: tsc
