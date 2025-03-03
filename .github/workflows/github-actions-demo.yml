@@ -29,5 +29,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "CI: обновленный билд"
-          git push
+          git commit -m "CI: new build"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Polyz2023/api.OmmaTracker.fullcoded.git
