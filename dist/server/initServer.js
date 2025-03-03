@@ -18,7 +18,7 @@ function InitServer() {
     (0, router_1.default)(app);
     const PORT = process.env.PORT || 7003;
     app.listen(PORT, () => {
-        console.log((0, colorConsole_1.default)('Server was started on port 7003', 'green', 'black', 'bold'));
+        console.log((0, colorConsole_1.default)(`Server was started on port ${PORT}`, 'green', 'black', 'bold'));
         setTimeout(() => {
             (0, endPointsList_1.default)(app);
         }, 2000);
