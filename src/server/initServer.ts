@@ -16,7 +16,7 @@ export default function InitServer(): void {
     const PORT = process.env.PORT || 7003
 
     app.listen(PORT, ()=>{
-        console.log(colorize('Server was started on port 7003', 'green', 'black', 'bold'));
+        console.log(colorize(`Server was started on port ${PORT}`, 'green', 'black', 'bold'));
         setTimeout(() => {
             ReturnEndPoints(app);
         }, 2000);
