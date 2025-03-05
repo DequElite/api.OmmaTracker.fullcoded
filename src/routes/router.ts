@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import RegisterRouter from "./register/RegisterRouter";
 import AuthRouter from "./auth/AuthRouter";
 import DataRouter from "./data/DataRouter";
+import colorize from "../utils/colorConsole";
 
 const API_DIR = "/api";
 
@@ -20,6 +21,10 @@ export default function InitRoutes(app:Express): void {
         credentials: true, 
     }));
 
+    app.get('/api/check-is-server-avaible', (req,res)=>{
+        console.log(colorize("Sevrver is avaible", 'magenta', 'blue', 'bold'))
+        res.status(200).json({ message: "Server is available" });
+    })
     app.use(`${API_DIR}/register`, RegisterRouter);
     app.use(`${API_DIR}/auth`, AuthRouter);
     app.use(`${API_DIR}/data`, DataRouter);
