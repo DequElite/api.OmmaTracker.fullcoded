@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx nodemon --watch src --ext ts --exec npx tsx src/index.ts",
-    "test:integration":"npx jest"
+    "test:integration": "npx jest"
   },
   "author": "FullCoded",
   "license": "ISC",
@@ -26,7 +26,8 @@
     "nodemon": "^3.1.9",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "pg": "^8.13.3"
+    "pg": "^8.13.3",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

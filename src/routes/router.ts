@@ -4,6 +4,8 @@ import RegisterRouter from "./register/RegisterRouter";
 import AuthRouter from "./auth/AuthRouter";
 import DataRouter from "./data/DataRouter";
 import colorize from "../utils/colorConsole";
+import ModerationRouter from "./moderation/ModerationRouter";
+import NotificationsRouter from "./notifications/NotificationsRouter";
 
 const API_DIR = "/api";
 
@@ -17,7 +19,7 @@ export default function InitRoutes(app:Express): void {
     app.use(cors({
         origin: process.env.APP_MODE === "DEV" ? process.env.FORNT_END_URI_DEV : process.env.FORNT_END_URI_PROD,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'], 
+        allowedHeaders: ['Content-Type', 'Authorization', 'admin-authorization'], 
         credentials: true, 
     }));
 
@@ -28,6 +30,8 @@ export default function InitRoutes(app:Express): void {
     app.use(`${API_DIR}/register`, RegisterRouter);
     app.use(`${API_DIR}/auth`, AuthRouter);
     app.use(`${API_DIR}/data`, DataRouter);
+    app.use(`${API_DIR}/moderation`, ModerationRouter);
+    app.use(`${API_DIR}/notifications`, NotificationsRouter);
 }
 
 
