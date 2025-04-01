@@ -54,6 +54,7 @@ const createUsersTable = () => __awaiter(void 0, void 0, void 0, function* () {
                 date_to_complete TIMESTAMP,
                 subTasksNumber INT,
                 completedSubTasks INT,
+                notification_sent BOOLEAN DEFAULT FALSE,
                 FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
             )
         `);
@@ -65,6 +66,38 @@ const createUsersTable = () => __awaiter(void 0, void 0, void 0, function* () {
                 is_completed BOOLEAN NOT NULL DEFAULT FALSE,
                 FOREIGN KEY (task_id) REFERENCES UsersTasks(id) ON DELETE CASCADE
             )
+        `);
+        yield db_1.pool.query(`
+            CREATE TABLE IF NOT EXISTS SuperAdmin (
+                id SERIAL PRIMARY KEY,
+                supername VARCHAR(50) NOT NULL UNIQUE,
+                superemail VARCHAR(100) NOT NULL UNIQUE,
+                superpassword VARCHAR(70) NOT NULL
+            ) 
+        `);
+        yield db_1.pool.query(`
+            CREATE TABLE IF NOT EXISTS Notifications (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                user_id INT NULL,  
+                is_global BOOLEAN DEFAULT TRUE, 
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,  
+                CONSTRAINT chk_is_global CHECK (is_global IN (TRUE, FALSE)) 
+            );
+        `);
+        yield db_1.pool.query(`
+            CREATE TABLE IF NOT EXISTS NotificationReadStatus (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL,
+                notification_id INT NOT NULL,
+                read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (notification_id) REFERENCES Notifications(id) ON DELETE CASCADE,
+                UNIQUE (user_id, notification_id)  
+            );
+
         `);
         const users = yield db_1.pool.query(`SELECT * FROM Users`);
         const usersAdditional = yield db_1.pool.query(`SELECT * FROM UsersAdditional`);

@@ -12,7 +12,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const authenticateToken_1 = require("../../../middleware/authenticateToken");
 const db_1 = require("../../../config/db");
+const __1 = require("../../..");
 const ReviewTaskRouter = (0, express_1.Router)();
+const SendNotificationAboutExpired = (task, req, user) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (task.notification_sent) {
+            return;
+        }
+        const result = yield db_1.pool.query(`
+                INSERT INTO Notifications (title, message, is_global, created_at, user_id)
+                VALUES ($1, $2, FALSE, NOW(), $3)
+                RETURNING *
+            `, [`The task ${task.name} will expire soon!`, `Your task will expire soon! Complete it quickly!`, user.id]);
+        const notfs = result.rows[0];
+        const io = req.app.get("io");
+        const socketId = __1.userSockets.get(user.id);
+        console.log("userSockets map:", __1.userSockets); // Лог для проверки наличия сокета
+        if (socketId) {
+            console.log(`Notification will be sent to socket ID: ${socketId}`);
+            io.to(socketId).emit("new_personal_notification", notfs);
+        }
+        else {
+            console.log(`Socket ID not found for user ${user.id}, user may be offline.`);
+        }
+        yield db_1.pool.query(`
+            UPDATE UsersTasks 
+            SET notification_sent = TRUE
+            WHERE id = $1
+        `, [task.id]);
+    }
+    catch (error) {
+        console.error("Error at SendNotificationAboutExpired: ", error);
+    }
+});
 ReviewTaskRouter.post('/all-tasks', authenticateToken_1.authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     try {
@@ -24,6 +56,15 @@ ReviewTaskRouter.post('/all-tasks', authenticateToken_1.authenticateToken, (req,
             res.status(200).json({ message: "user don`t have any tasks", usertasks: [] });
             return;
         }
+        result.rows.map((task) => {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const taskDate = new Date(task.date_to_complete);
+            if (taskDate.toDateString() === tomorrow.toDateString()) {
+                SendNotificationAboutExpired(task, req, user);
+            }
+        });
         res.status(200).json({ message: "All user`s tasks are found", usertasks: result.rows });
     }
     catch (error) {
