@@ -57,7 +57,7 @@ SignUpRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, fun
         yield CreateUserAdditionalInfo(newUser.id, refreshToken);
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.APP_MODE === "PROD",
+            secure: false,
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
         });
