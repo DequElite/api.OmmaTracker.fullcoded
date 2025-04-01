@@ -67,7 +67,7 @@ SignUpRouter.post('/signup', async (req, res)=>{
             httpOnly: true,
             secure: process.env.APP_MODE !== "DEV",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: process.env.APP_MODE === "DEV" ? "strict" : "lax",
+            sameSite: "none",
         });
 
 
