@@ -65,9 +65,9 @@ SignUpRouter.post('/signup', async (req, res)=>{
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: process.env.APP_MODE !== "DEV",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: process.env.APP_MODE === "DEV" ? "strict" : "none",
+            sameSite: process.env.APP_MODE === "DEV" ? "strict" : "lax",
         });
 
 
