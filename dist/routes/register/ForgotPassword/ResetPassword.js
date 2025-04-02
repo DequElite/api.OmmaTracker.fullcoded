@@ -15,11 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const db_1 = require("../../../config/db");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const validateSignData_1 = require("../../../middleware/validateSignData");
 const ResetPasswordRouter = (0, express_1.Router)();
 const SALT_ROUNDS = 10;
 ResetPasswordRouter.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { resetToken, newUserPassword } = req.body;
     console.log(req.body);
+    const ValidateResult = validateSignData_1.passwordSchema.safeParse(newUserPassword);
+    if (!ValidateResult.success) {
+        res.status(400).json({ errors: ValidateResult.error.format(), message: "DATA_NOT_VALIDATED" });
+        throw new Error("DATA_NOT_VALIDATED");
+    }
     try {
         const resultUserAdditional = yield db_1.pool.query(`
             SELECT * FROM UsersAdditional

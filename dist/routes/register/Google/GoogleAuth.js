@@ -92,6 +92,7 @@ GoogleAuth.get('/google/callback', passport_1.default.authenticate("google", { s
         secure: process.env.APP_MODE !== "DEV",
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: "none",
+        domain: process.env.APP_MODE === "DEV" ? process.env.FRONT_PROD_DOMAIN_NAME : undefined
     });
     res.redirect(`${CLIENT_URL}/home?accessToken=${accessToken}`);
 });

@@ -16,6 +16,7 @@ const express_1 = require("express");
 const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const db_1 = require("../../../config/db");
+const validateSignData_1 = require("../../../middleware/validateSignData");
 const SendKeyRouter = (0, express_1.Router)();
 require("dotenv").config();
 const transporter = nodemailer_1.default.createTransport({
@@ -42,6 +43,11 @@ const sendEmail = (to, subject, html) => __awaiter(void 0, void 0, void 0, funct
 });
 SendKeyRouter.post('/send-key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
+    const ValidateResult = validateSignData_1.emailSchema.safeParse(email);
+    if (!ValidateResult.success) {
+        res.status(400).json({ errors: ValidateResult.error.format(), message: "DATA_NOT_VALIDATED" });
+        throw new Error("DATA_NOT_VALIDATED");
+    }
     try {
         const result = yield db_1.pool.query(`
             SELECT * FROM Users
@@ -70,7 +76,8 @@ SendKeyRouter.post('/send-key', (req, res) => __awaiter(void 0, void 0, void 0, 
                 VALUES ($1, $2, $3)
             `, [user.id, resetToken, resetTokenExpireAt]);
         }
-        const resetLink = `${process.env.EMAIL_RESET_LINK}${resetToken}`;
+        const resetLinkDomain = process.env.APP_MODE === "DEV" ? process.env.EMAIL_DEV_RESET_LINK : process.env.EMAIL_PROD_RESET_LINK;
+        const resetLink = `${resetLinkDomain}${resetToken}`;
         try {
             yield sendEmail(email, "Password recovery link", `
                 Hello! \n 

@@ -16,6 +16,7 @@ const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../../../config/db");
+const validateSignData_1 = require("../../../middleware/validateSignData");
 const SignInRouter = (0, express_1.Router)();
 require("dotenv").config();
 const JWT_TOKEN_LIFETIME = process.env.JWT_TOKEN_LIFE || "1h";
@@ -43,7 +44,7 @@ const SignInUser = (email, password) => __awaiter(void 0, void 0, void 0, functi
     `, [refreshToken, user.id]);
     return { accessToken, refreshToken };
 });
-SignInRouter.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+SignInRouter.post('/signin', validateSignData_1.validateSign, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     try {
         const { accessToken, refreshToken } = yield SignInUser(email, password);
@@ -52,6 +53,7 @@ SignInRouter.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, fun
             secure: process.env.APP_MODE !== "DEV",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "none",
+            domain: process.env.APP_MODE === "DEV" ? process.env.FRONT_PROD_DOMAIN_NAME : undefined
         });
         res.status(201).json({
             message: "User was signin ssuccessfuly",
