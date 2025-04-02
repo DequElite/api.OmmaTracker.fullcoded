@@ -3,6 +3,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { pool } from "../../../config/db";
+import { emailSchema } from "../../../middleware/validateSignData";
 
 const SendKeyRouter = Router();
 
@@ -33,6 +34,12 @@ const sendEmail = async (to:any, subject:any, html:any) => {
 
 SendKeyRouter.post('/send-key', async (req,res)=>{
     const { email } = req.body;
+
+    const ValidateResult = emailSchema.safeParse(email);
+    if(!ValidateResult.success){
+        res.status(400).json({errors: ValidateResult.error.format(), message: "DATA_NOT_VALIDATED"});
+        throw new Error("DATA_NOT_VALIDATED")
+    }
 
     try{
         const result = await pool.query(`
@@ -67,7 +74,8 @@ SendKeyRouter.post('/send-key', async (req,res)=>{
             `, [user.id, resetToken, resetTokenExpireAt]);
         }
 
-        const resetLink = `${process.env.EMAIL_RESET_LINK}${resetToken}`;
+        const resetLinkDomain = process.env.APP_MODE === "DEV" ? process.env.EMAIL_DEV_RESET_LINK : process.env.EMAIL_PROD_RESET_LINK;
+        const resetLink = `${resetLinkDomain}${resetToken}`;
 
         try{
             await sendEmail(

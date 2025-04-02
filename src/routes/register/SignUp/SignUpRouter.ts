@@ -1,7 +1,8 @@
-import {Router} from "express";
+import {Router, Request, Response} from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 import { pool } from "../../../config/db";
+import { validateSign } from "../../../middleware/validateSignData";
 
 const SignUpRouter = Router();
 
@@ -43,7 +44,7 @@ const CreateUserAdditionalInfo = async (userId: number, refreshToken: string) =>
 }
 
 
-SignUpRouter.post('/signup', async (req, res)=>{
+SignUpRouter.post('/signup', validateSign, async (req: Request, res: Response)=>{
     const {username, password, email} = req.body;
     console.log(req.body)
     try{
@@ -68,6 +69,7 @@ SignUpRouter.post('/signup', async (req, res)=>{
             secure: process.env.APP_MODE !== "DEV",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             sameSite: "none",
+            domain: process.env.APP_MODE === "DEV" ? process.env.FRONT_PROD_DOMAIN_NAME : undefined
         });
 
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../../../config/db";
 import bcrypt from "bcrypt"
+import { passwordSchema, validateSign } from "../../../middleware/validateSignData";
 
 const ResetPasswordRouter = Router();
 
@@ -9,6 +10,12 @@ const SALT_ROUNDS = 10;
 ResetPasswordRouter.post('/reset-password', async (req, res)=>{
     const {resetToken, newUserPassword} = req.body;
     console.log(req.body)
+
+    const ValidateResult = passwordSchema.safeParse(newUserPassword);
+    if(!ValidateResult.success){
+        res.status(400).json({errors: ValidateResult.error.format(), message: "DATA_NOT_VALIDATED"});
+        throw new Error("DATA_NOT_VALIDATED")
+    }
 
     try{
         const resultUserAdditional = await pool.query(`
